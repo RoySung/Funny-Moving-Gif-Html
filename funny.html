@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Title Page</title>
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<style type="text/css" media="screen">
+			#pane {
+			    position:relative;
+			    width:100vw; height:100vh;
+			    background-color: #212129;
+			}
+			    
+			#box {
+			    position:absolute; top:140px; left:140px;
+			    width: 400px;
+			    background-image: url("./skull.gif");
+			}	
+		</style>
+	</head>
+	<body>
+		<div id="pane">
+		    <img id="box" src="./skull.gif"></img>
+		</div>
+		<script type="text/javascript">
+			var pane = $('#pane'),
+			    box = $('#box'),
+			    w = pane.width() - box.width(),
+			    d = {},
+			    x = 30;
+
+			function newv(v,a,b) {
+			    var n = parseInt(v, 10) - (d[a] ? x : 0) + (d[b] ? x : 0);
+			    return n < 0 ? 0 : n > w ? w : n;
+			}
+
+			$(window).keydown(function(e) { d[e.which] = true; });
+			$(window).keyup(function(e) { d[e.which] = false; });
+
+			setInterval(function() {
+			    box.css({
+			        left: function(i,v) { return newv(v, 37, 39); },
+			        top: function(i,v) { return newv(v, 38, 40); },
+			        width: function(i,v) { return newv(v, 189, 187); }
+			    });
+			}, 100);
+		</script>
+	</body>
+</html>
