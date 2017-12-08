@@ -5,17 +5,19 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Title Page</title>
-
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/5.0.1/Rx.js"></script>
 		<style type="text/css" media="screen">
+			body {
+				width:100vw;
+				height:100vh;
+				background-color: #212129;
+			}
 			#pane {
 			    position:relative;
-			    width:100vw; height:100vh;
-			    background-color: #212129;
+				width:100%;
+				height:100%;
 			}
-			    
 			#box {
 			    position:absolute; top:140px; left:140px;
 			    width: 400px;
@@ -30,25 +32,44 @@
 		<script type="text/javascript">
 			var pane = $('#pane'),
 			    box = $('#box'),
-			    w = pane.width() - box.width(),
-			    d = {},
+			    w = calculateWidth(),
 			    x = 30;
 
-			function newv(v,a,b) {
-			    var n = parseInt(v, 10) - (d[a] ? x : 0) + (d[b] ? x : 0);
-			    return n < 0 ? 0 : n > w ? w : n;
+			const keydown = Rx.Observable.fromEvent(document, 'keydown');
+
+			const keyup = Rx.Observable.fromEvent(document, 'keyup');
+
+			const keyHandle = keydown.withLatestFrom(keyup)
+
+			let keyState = {}
+
+			keydown.subscribe((e) => {
+				const keyCode = e.keyCode
+				keyState[keyCode] = true
+				w = calculateWidth()
+			})
+
+			keyup.subscribe((e) => {
+				const keyCode = e.keyCode
+				keyState[keyCode] = false
+			})
+
+			keyHandle.subscribe(() => {
+				box.css({
+			        left: (i,v) => newv(v, 37, 39),
+			        top: (i,v) => newv(v, 38, 40),
+			        width: (i,v) => newv(v, 189, 187)
+			    })
+			})
+
+			function newv(v, deCode, inCode) {
+			    var n = parseInt(v, 10) - (keyState[deCode] ? x : 0) + (keyState[inCode] ? x : 0);
+			    return n < 0 ? 0 : (n > w ? w : n)
 			}
 
-			$(window).keydown(function(e) { d[e.which] = true; });
-			$(window).keyup(function(e) { d[e.which] = false; });
-
-			setInterval(function() {
-			    box.css({
-			        left: function(i,v) { return newv(v, 37, 39); },
-			        top: function(i,v) { return newv(v, 38, 40); },
-			        width: function(i,v) { return newv(v, 189, 187); }
-			    });
-			}, 100);
+			function calculateWidth() {
+				return pane.width() - box.width()
+			}
 		</script>
 	</body>
 </html>
